@@ -1,23 +1,25 @@
 let alphabet = "абвгдежзийклмнопрстуфхцчшщъыьэюя";
+let abetka = alphabet.split('');
 
 function cryptor(text, key) {
-	// алфавит преобразовать в массив
-	let abetka = alphabet.split('');
-	// текст преобразовать в массив
-	let inText = text.split('');
-	// сделать цикл и найти номер буквы текста в массиве алфавит и создать массив номеров букв
-	arrNumbersLetters = getNumbersLetters(inText, abetka);
-	// создать новый массив используя элементы массив плюс ключ
-	arrNumbersWithKey = numbersCrypt(arrNumbersLetters, key);
-	// получить массив букв используя номера из массива номеров
-	arrCryptLetters = getLettersFromNumbers(arrNumbersWithKey, abetka, key);
-	// преобразовтаь массив в текст и преобразовать текст в верхний регистр 
-	cryptWords = arrCryptLetters.join('').toUpperCase();
-	// вернуть текст
+	let textForCrypt = text.split('');
+	let crIndexesLetters = getIndexesLetters(textForCrypt, abetka);
+	let crNumbersAddKey = numbersCrypt(crIndexesLetters, key, abetka);
+	let crCryptLetters = getLettersFromNumbers(crNumbersAddKey, abetka, key);
+	let cryptWords = crCryptLetters.join('').toUpperCase();
 	return cryptWords;
 }
 
-function getNumbersLetters (text, abetka) {
+function decryptor (text, key) {
+	let textForUncrypt = text.toLowerCase().split('');
+	let dcIndexesLetters = getIndexesLetters(textForUncrypt, abetka);
+	let dcNumbersSubsKey = indexesCrypt(dcIndexesLetters, key, abetka);
+	let dcUncryptLetters = getLettersFromNumbers(dcNumbersSubsKey, abetka, key);
+	let uncryptWords = dcUncryptLetters.join('');
+	return uncryptWords;
+}
+
+function getIndexesLetters (text, abetka) {
 	let {numbers} = text.reduce(
 		function({letters, numbers}, current) {
 			needLetters = [...numbers, letters.indexOf(current)];
@@ -27,10 +29,19 @@ function getNumbersLetters (text, abetka) {
 	return numbers;
 }
 
-function numbersCrypt (arr, key) {
+function indexesCrypt (arr, key, abetka) {
 	let newArr = arr.map(
 		function(current) {
-			return current + key;
+			return ((current - key) < 0 ? (abetka.length - 1) + (current - key) : current - key);
+		}
+	);
+	return newArr;
+}
+
+function numbersCrypt (arr, key, abetka) {
+	let newArr = arr.map(
+		function(current) {
+			return ((current + key) > abetka.length ? key - (abetka.length - current) : current + key);
 		}
 	);
 	return newArr;
@@ -39,21 +50,9 @@ function numbersCrypt (arr, key) {
 function getLettersFromNumbers (arr, abetka, key) {
 	let {letters} = arr.reduce(
 		function({abetka, letters}, current) {
-			let place;
-			if ((current + key) > abetka.length) {
-				 place = key - (abetka.length - current) - 1;
-			} else {
-				place = current;
-			}
-			needLetters = [...letters, abetka[place]];
+			needLetters = [...letters, abetka[current]];
 			return ({abetka: abetka, letters: needLetters});
 		}, {abetka: abetka, letters: []}
 	);
 	return letters;
 }
-
-
-
-
-
-
