@@ -4,7 +4,9 @@ let abetka = alphabet.split('');
 function cryptor(text, key) {
 	let textForCrypt = text.split('');
 	let crIndexesLetters = getIndexesLetters(textForCrypt, abetka);
-	let crNumbersAddKey = numbersCrypt(crIndexesLetters, key, abetka);
+  let crNumbersAddKey = crIndexesLetters.map(
+  	numbersCrypt(current, key, abetka)
+  );
 	let crCryptLetters = getLettersFromNumbers(crNumbersAddKey, abetka, key);
 	let cryptWords = crCryptLetters.join('').toUpperCase();
 	return cryptWords;
@@ -13,7 +15,10 @@ function cryptor(text, key) {
 function decryptor (text, key) {
 	let textForUncrypt = text.toLowerCase().split('');
 	let dcIndexesLetters = getIndexesLetters(textForUncrypt, abetka);
-	let dcNumbersSubsKey = indexesCrypt(dcIndexesLetters, key, abetka);
+	let dcNumbersSubsKey = dcIndexesLetters.map(
+		indexesCrypt(current, key, abetka)
+	);
+	indexesCrypt(dcIndexesLetters, key, abetka);
 	let dcUncryptLetters = getLettersFromNumbers(dcNumbersSubsKey, abetka, key);
 	let uncryptWords = dcUncryptLetters.join('');
 	return uncryptWords;
@@ -29,22 +34,16 @@ function getIndexesLetters (text, abetka) {
 	return numbers;
 }
 
-function indexesCrypt (arr, key, abetka) {
-	let newArr = arr.map(
-		function(current) {
-			return ((current - key) < 0 ? (abetka.length - 1) + (current - key) : current - key);
-		}
+function indexesCrypt (current, key, abetka) {
+	return (
+		(current - key) < 0 ? (abetka.length - 1) + (current - key) : current - key
 	);
-	return newArr;
 }
 
-function numbersCrypt (arr, key, abetka) {
-	let newArr = arr.map(
-		function(current) {
-			return ((current + key) > abetka.length ? key - (abetka.length - current) : current + key);
-		}
+function numbersCrypt (current, key, abetka) {
+	return (
+		(current + key) > abetka.length ? key - (abetka.length - current) : current + key
 	);
-	return newArr;
 }
 
 function getLettersFromNumbers (arr, abetka, key) {
