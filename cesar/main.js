@@ -1,58 +1,20 @@
-let alphabet = "абвгдежзийклмнопрстуфхцчшщъыьэюя";
-let abetka = alphabet.split('');
+let alphabetLength = 32
+let charToInt = (c) => c.charCodeAt(0)
+let intToChar = (n) => String.fromCharCode(n)
+let startingPoint = charToInt('a')
 
-function cryptor(text, key) {
-	let textForCrypt = text.split('');
-	let crIndexesLetters = getIndexesLetters(textForCrypt, abetka);
-	let crNumbersAddKey = numbersCrypt(crIndexesLetters, key, abetka);
-	let crCryptLetters = getLettersFromNumbers(crNumbersAddKey, abetka, key);
-	let cryptWords = crCryptLetters.join('').toUpperCase();
-	return cryptWords;
+let encrypt = (offset, text) => {
+	return text.split('').map(c => encryptChar(offset, c)).join('')
 }
 
-function decryptor (text, key) {
-	let textForUncrypt = text.toLowerCase().split('');
-	let dcIndexesLetters = getIndexesLetters(textForUncrypt, abetka);
-	let dcNumbersSubsKey = indexesCrypt(dcIndexesLetters, key, abetka);
-	let dcUncryptLetters = getLettersFromNumbers(dcNumbersSubsKey, abetka, key);
-	let uncryptWords = dcUncryptLetters.join('');
-	return uncryptWords;
+let encryptChar = (offset, c) => {
+	return offset > 0 ? cycleChar(offset, c) : offset < 0 ? cycleChar(alphabetLength + offset) : c
 }
 
-function getIndexesLetters (text, abetka) {
-	let {numbers} = text.reduce(
-		function({letters, numbers}, current) {
-			needLetters = [...numbers, letters.indexOf(current)];
-			return ({letters: abetka, numbers: needLetters});
-		}, {letters: abetka, numbers: []}
-	);
-	return numbers;
+let cycleChar = (offset, c) => {
+	return intToChar((charToInt(c) - startingPoint + offset) % alphabetLength + startingPoint)
 }
 
-function indexesCrypt (arr, key, abetka) {
-	let newArr = arr.map(
-		function(current) {
-			return ((current - key) < 0 ? (abetka.length - 1) + (current - key) : current - key);
-		}
-	);
-	return newArr;
-}
-
-function numbersCrypt (arr, key, abetka) {
-	let newArr = arr.map(
-		function(current) {
-			return ((current + key) > abetka.length ? key - (abetka.length - current) : current + key);
-		}
-	);
-	return newArr;
-}
-
-function getLettersFromNumbers (arr, abetka, key) {
-	let {letters} = arr.reduce(
-		function({abetka, letters}, current) {
-			needLetters = [...letters, abetka[current]];
-			return ({abetka: abetka, letters: needLetters});
-		}, {abetka: abetka, letters: []}
-	);
-	return letters;
+let decrypt = (offset, text) => {
+	return encrypt(-offset, text)
 }
